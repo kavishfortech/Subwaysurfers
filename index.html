@@ -1,193 +1,190 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KAVISH SHAH | SURFER_RUN</title>
+    <title>KAVISH SHAH | NEON SURFER</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=JetBrains+Mono:wght@400;800&display=swap');
-
-        :root {
-            --neon-blue: #00f2ff;
-            --neon-green: #39ff14;
-            --neon-pink: #ff00ea;
-            --bg-black: #050508;
-            --panel-bg: rgba(12, 12, 20, 0.98);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'JetBrains Mono', monospace;
-            background: var(--bg-black);
-            color: #fff;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        /* --- SIGNATURE COLOR BOX HEADER --- */
-        .header-section {
-            width: 100%;
-            padding: 20px 15px;
-            display: flex;
-            justify-content: center;
-            background: #000;
-            border-bottom: 2px solid var(--neon-blue);
-        }
-
-        .color-shift-box {
-            padding: 15px 30px;
-            border: 3px solid var(--neon-blue);
-            border-radius: 10px;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.9);
-            animation: borderCycle 8s infinite alternate;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-
-        @keyframes borderCycle {
-            0% { border-color: var(--neon-blue); box-shadow: 0 0 25px var(--neon-blue); }
-            50% { border-color: var(--neon-pink); box-shadow: 0 0 25px var(--neon-pink); }
-            100% { border-color: var(--neon-green); box-shadow: 0 0 25px var(--neon-green); }
-        }
-
-        .color-shift-box h1 {
-            font-family: 'Syncopate', sans-serif;
-            font-size: 1.5rem;
-            letter-spacing: -1px;
-            animation: textCycle 8s infinite alternate;
-            margin: 0;
-        }
-
-        @keyframes textCycle {
-            0% { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
-            50% { color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink); }
-            100% { color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green); }
-        }
-
-        /* --- GAME CONSOLE CONTAINER --- */
-        .console-frame {
-            flex-grow: 1;
-            width: 95%;
-            max-width: 1000px;
-            margin: 20px 0;
-            background: var(--panel-bg);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 15px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 40px rgba(0,0,0,0.8);
-        }
-
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: #000;
-        }
-
-        /* --- NAVIGATION BUTTONS --- */
-        .nav-bar {
-            width: 95%;
-            max-width: 1000px;
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .btn-ui {
-            flex: 1;
-            padding: 12px;
-            background: transparent;
-            border: 2px solid var(--neon-blue);
-            color: var(--neon-blue);
-            font-weight: 800;
-            text-transform: uppercase;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            text-align: center;
-            font-size: 0.8rem;
-            transition: 0.3s;
-        }
-
-        .btn-ui:hover {
-            background: rgba(0, 242, 255, 0.1);
-            box-shadow: 0 0 15px var(--neon-blue);
-        }
-
-        .btn-pink { border-color: var(--neon-pink); color: var(--neon-pink); }
-        .btn-pink:hover { background: rgba(255, 0, 234, 0.1); box-shadow: 0 0 15px var(--neon-pink); }
-
-        /* --- SYSTEM LOG --- */
-        .sys-log {
-            width: 100%;
-            background: #000;
-            padding: 10px 25px;
-            color: var(--neon-green);
-            font-size: 0.75rem;
-            border-top: 1px solid #111;
-            height: 40px;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-
-        .scanline {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 2px;
-            background: rgba(0, 242, 255, 0.05);
-            z-index: 1000;
-            pointer-events: none;
-            animation: scan 4s linear infinite;
-        }
-
-        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+        :root { --neon-blue: #00f2ff; --neon-pink: #ff00ea; --bg: #050508; }
+        * { box-sizing: border-box; margin: 0; padding: 0; touch-action: none; }
+        body { font-family: 'JetBrains Mono', monospace; background: var(--bg); color: #fff; overflow: hidden; display: flex; flex-direction: column; align-items: center; }
+        
+        .header-section { width: 100%; padding: 20px; background: #000; border-bottom: 2px solid var(--neon-blue); display: flex; justify-content: center; }
+        .color-shift-box { padding: 15px 30px; border: 3px solid var(--neon-blue); border-radius: 10px; animation: borderCycle 8s infinite alternate; text-align: center; }
+        @keyframes borderCycle { 0% { border-color: var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); } 100% { border-color: var(--neon-pink); box-shadow: 0 0 20px var(--neon-pink); } }
+        
+        #gameContainer { position: relative; width: 100vw; height: 70vh; background: #000; overflow: hidden; border-bottom: 2px solid #111; }
+        canvas { width: 100%; height: 100%; display: block; }
+        
+        .ui-overlay { position: absolute; top: 10px; width: 100%; display: flex; justify-content: space-around; font-weight: 800; font-size: 1.2rem; pointer-events: none; }
+        .death-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
+        
+        .btn-ui { padding: 15px 40px; background: transparent; border: 2px solid var(--neon-blue); color: var(--neon-blue); font-weight: 800; text-transform: uppercase; border-radius: 8px; cursor: pointer; margin-top: 20px; }
+        .btn-ui:active { background: var(--neon-blue); color: #000; }
+        .controls { display: flex; gap: 20px; padding: 20px; width: 100%; }
+        .ctrl-btn { flex: 1; height: 60px; background: #111; border: 2px solid #333; color: #fff; border-radius: 10px; font-size: 1.5rem; }
     </style>
 </head>
 <body>
 
-    <div class="scanline"></div>
-
     <header class="header-section">
         <div class="color-shift-box">
-            <h1>SUBWAY SURFERS</h1>
-            <p style="color: #666; font-size: 0.6rem; letter-spacing: 3px;">KAVISHFORTYTECH | EXT_LINK_6.9</p>
+            <h1 style="font-family: 'Syncopate'; font-size: 1.2rem;">NEON SURFER 3D</h1>
         </div>
     </header>
 
-    <main class="console-frame">
-        <iframe 
-            src="https://poki.com/en/g/subway-surfers" 
-            allow="autoplay; fullscreen; keyboard"
-            onload="log('Uplink Established. Game Signal Synchronized.')">
-        </iframe>
-    </main>
-
-    <div class="nav-bar">
-        <a href="https://kavishfortech.github.io/Kavishforgames" class="btn-ui">◀ EXIT TO HUB</a>
-        <button class="btn-ui btn-pink" onclick="location.reload()">REBOOT SIGNAL</button>
+    <div id="gameContainer">
+        <div class="ui-overlay">
+            <span style="color:var(--neon-blue)">SCORE: <span id="scoreVal">0</span></span>
+            <span style="color:var(--neon-pink)">FPS: <span id="fpsVal">60</span></span>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+        <div id="deathScreen" class="death-screen">
+            <h2 style="color:var(--neon-pink); font-family:'Syncopate'; font-size: 2rem;">CRITICAL ERROR</h2>
+            <button class="btn-ui" onclick="game.init()">RESTART UPLINK</button>
+            <a href="https://kavishfortech.github.io/Kavishforgames" style="text-decoration:none;"><button class="btn-ui" style="border-color:#fff; color:#fff;">EXIT HUB</button></a>
+        </div>
     </div>
 
-    <div class="sys-log" id="termLog">
-        > [SYS] Initializing external neural bridge...
+    <div class="controls">
+        <button class="ctrl-btn" onpointerdown="game.move(-1)">◀</button>
+        <button class="ctrl-btn" onpointerdown="game.move(1)">▶</button>
     </div>
 
     <script>
-        function log(msg) {
-            const l = document.getElementById('termLog');
-            l.innerText = `> [SYS] ${msg}`;
-        }
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
         
-        // Boot Sequence
-        setTimeout(() => log("Bypassing Poki security protocols..."), 1000);
-        setTimeout(() => log("Injecting Architect UI Theme..."), 2000);
+        const game = {
+            active: false,
+            score: 0,
+            lane: 0, // -1: Left, 0: Center, 1: Right
+            targetLane: 0,
+            obstacles: [],
+            speed: 0.05,
+            horizonY: 0,
+            lastFrame: 0,
+
+            init() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight * 0.7;
+                this.horizonY = canvas.height * 0.4;
+                this.active = true;
+                this.score = 0;
+                this.lane = 0;
+                this.targetLane = 0;
+                this.obstacles = [];
+                this.speed = 0.05;
+                document.getElementById('deathScreen').style.display = 'none';
+                requestAnimationFrame((t) => this.loop(t));
+            },
+
+            move(dir) {
+                this.targetLane = Math.max(-1, Math.min(1, this.targetLane + dir));
+            },
+
+            spawnObstacle() {
+                if (Math.random() < 0.03) {
+                    this.obstacles.push({
+                        lane: Math.floor(Math.random() * 3) - 1,
+                        z: 1, // Start at horizon
+                        w: 20,
+                        h: 20
+                    });
+                }
+            },
+
+            loop(t) {
+                if (!this.active) return;
+                const dt = t - this.lastFrame;
+                this.lastFrame = t;
+                document.getElementById('fpsVal').innerText = Math.round(1000/dt);
+
+                this.update();
+                this.draw();
+                requestAnimationFrame((t) => this.loop(t));
+            },
+
+            update() {
+                this.score++;
+                document.getElementById('scoreVal').innerText = Math.floor(this.score/10);
+                this.speed += 0.00001;
+
+                // Smooth lane transition
+                this.lane += (this.targetLane - this.lane) * 0.2;
+
+                this.spawnObstacle();
+
+                for (let i = this.obstacles.length - 1; i >= 0; i--) {
+                    let o = this.obstacles[i];
+                    o.z -= this.speed;
+
+                    // Collision (Player is at Z near 0)
+                    if (o.z < 0.15 && o.z > 0.05 && Math.abs(o.lane - this.lane) < 0.5) {
+                        this.gameOver();
+                    }
+
+                    if (o.z < 0) this.obstacles.splice(i, 1);
+                }
+            },
+
+            draw() {
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Draw Floor Grid
+                ctx.strokeStyle = '#111';
+                for (let i = 0; i < 10; i++) {
+                    let z = (i / 10 + (this.score * 0.005) % 0.1);
+                    let y = this.horizonY + (canvas.height - this.horizonY) * z;
+                    ctx.beginPath();
+                    ctx.moveTo(0, y); ctx.lineTo(canvas.width, y);
+                    ctx.stroke();
+                }
+
+                // Draw Lane Lines
+                const centerX = canvas.width / 2;
+                [-1.5, -0.5, 0.5, 1.5].forEach(l => {
+                    ctx.beginPath();
+                    ctx.moveTo(centerX + (l * 10), this.horizonY);
+                    ctx.lineTo(centerX + (l * canvas.width), canvas.height);
+                    ctx.stroke();
+                });
+
+                // Draw Obstacles
+                this.obstacles.forEach(o => {
+                    let perspective = 1 / o.z;
+                    let x = centerX + (o.lane - this.lane) * 150 * perspective;
+                    let y = this.horizonY + 200 * perspective;
+                    let size = 30 * perspective;
+
+                    ctx.fillStyle = '#ff00ea';
+                    ctx.shadowBlur = 15; ctx.shadowColor = '#ff00ea';
+                    ctx.fillRect(x - size/2, y - size, size, size);
+                    ctx.shadowBlur = 0;
+                });
+
+                // Draw Player (The Architect Box)
+                ctx.fillStyle = '#00f2ff';
+                ctx.shadowBlur = 20; ctx.shadowColor = '#00f2ff';
+                ctx.fillRect(centerX - 25, canvas.height - 80, 50, 50);
+                ctx.shadowBlur = 0;
+            },
+
+            gameOver() {
+                this.active = false;
+                document.getElementById('deathScreen').style.display = 'flex';
+            }
+        };
+
+        window.addEventListener('keydown', e => {
+            if (e.key === 'ArrowLeft') game.move(-1);
+            if (e.key === 'ArrowRight') game.move(1);
+        });
+
+        game.init();
     </script>
 </body>
 </html>
