@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,13 +16,11 @@
             height: 100vh; display: flex; flex-direction: column; align-items: center;
         }
 
-        /* --- THE 3-SIDE OPEN FRAME --- */
         #gameWrapper {
-            margin-top: 10vh;
+            margin-top: 8vh;
             width: 90vw;
             max-width: 400px;
             height: 40vh;
-            /* Borders only on Left, Right, and Bottom */
             border-left: 3px solid var(--neon-blue);
             border-right: 3px solid var(--neon-blue);
             border-bottom: 3px solid var(--neon-blue);
@@ -36,9 +35,9 @@
             position: absolute; top: 10px; width: 100%;
             display: flex; justify-content: center;
             font-size: 1.1rem; font-weight: 800; color: var(--neon-blue);
+            z-index: 10;
         }
 
-        /* --- NAVIGATION & JUMP CONTROLS --- */
         .btn-container {
             display: grid;
             grid-template-columns: 1fr 1.5fr 1fr;
@@ -52,13 +51,14 @@
             border: 2px solid var(--neon-blue); color: var(--neon-blue);
             border-radius: 12px; font-size: 1.5rem;
             display: flex; align-items: center; justify-content: center;
-            font-family: 'Syncopate';
+            user-select: none;
         }
-        .jump-btn { border-color: var(--neon-pink); color: var(--neon-pink); font-size: 1rem; }
-        .ctrl-btn:active { background: #222; opacity: 0.7; }
+        .jump-btn { border-color: var(--neon-pink); color: var(--neon-pink); font-family: 'Syncopate'; font-size: 0.9rem; }
+        .ctrl-btn:active { background: var(--neon-blue); color: #000; }
+        .jump-btn:active { background: var(--neon-pink); color: #000; }
 
         .death-msg {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.9);
+            position: absolute; inset: 0; background: rgba(0,0,0,0.95);
             display: none; flex-direction: column; align-items: center; justify-content: center;
             z-index: 100;
         }
@@ -66,13 +66,13 @@
 </head>
 <body>
 
-    <h1 style="font-family:'Syncopate'; font-size: 0.7rem; margin-top: 20px; letter-spacing: 5px; color: #444;">VORTEX_RUNNER_6.9</h1>
+    <h1 style="font-family:'Syncopate'; font-size: 0.7rem; margin-top: 15px; letter-spacing: 5px; color: #444;">INSTANT_SURGE_v2</h1>
 
     <div id="gameWrapper">
-        <div class="score-hud">SCORE: <span id="scoreVal">0</span></div>
+        <div class="score-hud">SCR: <span id="scoreVal">0</span></div>
         <canvas id="gameCanvas"></canvas>
         <div id="deathMsg" class="death-msg">
-            <h2 style="color:var(--neon-pink); font-family:'Syncopate'; font-size: 1.2rem;">COLLISION DETECTED</h2>
+            <h2 style="color:var(--neon-pink); font-family:'Syncopate';">CRASHED</h2>
             <button onclick="game.init()" style="margin-top:20px; padding:10px 25px; background:none; border:2px solid var(--neon-blue); color:var(--neon-blue); font-family:'Syncopate'; cursor:pointer;">REBOOT</button>
         </div>
     </div>
@@ -88,25 +88,28 @@
         const ctx = canvas.getContext('2d');
 
         const game = {
-            active: false, score: 0, lane: 0, targetLane: 0,
+            active: false, score: 0, lane: 0,
             obstacles: [], speed: 0.05,
             yPos: 0, yVel: 0, isJumping: false,
 
             init() {
                 canvas.width = canvas.offsetWidth;
                 canvas.height = canvas.offsetHeight;
-                this.active = true; this.score = 0; this.lane = 0; this.targetLane = 0;
+                this.active = true; this.score = 0; this.lane = 0;
                 this.obstacles = []; this.speed = 0.05;
                 this.yPos = 0; this.yVel = 0; this.isJumping = false;
                 document.getElementById('deathMsg').style.display = 'none';
-                requestAnimationFrame((t) => this.loop());
+                requestAnimationFrame(() => this.loop());
             },
 
-            move(dir) { this.targetLane = Math.max(-1, Math.min(1, this.targetLane + dir)); },
+            // REMOVED DELAY: Character now snaps instantly to lane
+            move(dir) { 
+                this.lane = Math.max(-1, Math.min(1, this.lane + dir)); 
+            },
             
             jump() {
                 if (!this.isJumping) {
-                    this.yVel = 12; // Initial jump force
+                    this.yVel = 14; 
                     this.isJumping = true;
                 }
             },
@@ -120,28 +123,22 @@
             update() {
                 this.score++;
                 document.getElementById('scoreVal').innerText = Math.floor(this.score/10);
-                this.lane += (this.targetLane - this.lane) * 0.2;
                 this.speed += 0.00001;
 
-                // Jump Physics
                 if (this.isJumping) {
                     this.yPos += this.yVel;
-                    this.yVel -= 0.8; // Gravity
-                    if (this.yPos <= 0) {
-                        this.yPos = 0;
-                        this.isJumping = false;
-                    }
+                    this.yVel -= 0.9; 
+                    if (this.yPos <= 0) { this.yPos = 0; this.isJumping = false; }
                 }
 
-                if (Math.random() < 0.04) this.obstacles.push({ lane: Math.floor(Math.random()*3)-1, z: 2 });
+                if (Math.random() < 0.045) this.obstacles.push({ lane: Math.floor(Math.random()*3)-1, z: 2 });
 
                 for (let i = this.obstacles.length - 1; i >= 0; i--) {
                     let o = this.obstacles[i];
                     o.z -= this.speed;
-
-                    // Collision Check (Only hits if player is NOT high enough in jump)
-                    if (o.z < 0.3 && o.z > 0.1 && Math.abs(o.lane - this.lane) < 0.5) {
-                        if (this.yPos < 40) this.gameOver(); // Player can jump over blocks
+                    // Collision check
+                    if (o.z < 0.3 && o.z > 0.1 && o.lane === this.lane) {
+                        if (this.yPos < 45) this.gameOver(); 
                     }
                     if (o.z < 0) this.obstacles.splice(i, 1);
                 }
@@ -152,7 +149,16 @@
                 const cx = canvas.width / 2;
                 const horizY = canvas.height * 0.3;
 
-                // Floor Grid (Lines moving toward you)
+                // DRAW LANE HIGHLIGHT (Helps you see where you are)
+                ctx.fillStyle = 'rgba(0, 242, 255, 0.05)';
+                let hX = cx + (this.lane * (canvas.width * 0.33));
+                ctx.beginPath();
+                ctx.moveTo(cx, horizY);
+                ctx.lineTo(hX - canvas.width*0.2, canvas.height);
+                ctx.lineTo(hX + canvas.width*0.2, canvas.height);
+                ctx.fill();
+
+                // Floor Grid
                 ctx.strokeStyle = '#111';
                 for(let i=0; i<10; i++) {
                     let z = (i/10 + (this.score*0.01)%0.1);
@@ -163,7 +169,7 @@
                 // Obstacles
                 this.obstacles.forEach(o => {
                     let s = 1/o.z;
-                    let x = cx + (o.lane - this.lane) * (canvas.width * 0.4) * s;
+                    let x = cx + (o.lane) * (canvas.width * 0.4) * s;
                     let y = horizY + (canvas.height - horizY) * s;
                     let sz = (canvas.width * 0.2) * s;
                     ctx.fillStyle = '#ff00ea';
@@ -171,13 +177,13 @@
                     ctx.fillRect(x-sz/2, y-sz, sz, sz);
                 });
 
-                // Player Character
+                // Player
                 ctx.fillStyle = '#00f2ff';
                 ctx.shadowBlur = 15; ctx.shadowColor = '#00f2ff';
                 let pSz = canvas.width * 0.14;
-                // Base Y + Jump Offset
-                let charY = (canvas.height * 0.75) - this.yPos;
-                ctx.fillRect(cx - pSz/2, charY, pSz, pSz);
+                let charX = cx + (this.lane * (canvas.width * 0.35));
+                let charY = (canvas.height * 0.8) - this.yPos;
+                ctx.fillRect(charX - pSz/2, charY, pSz, pSz);
             },
 
             gameOver() { this.active = false; document.getElementById('deathMsg').style.display = 'flex'; }
