@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KAVISH SHAH | NEON SURFER 3D</title>
+    <title>KAVISH SHAH | NEON SURFER</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=JetBrains+Mono:wght@400;800&display=swap');
         :root { --neon-blue: #00f2ff; --neon-pink: #ff00ea; --bg: #050508; }
@@ -15,106 +15,134 @@
             height: 100vh; display: flex; flex-direction: column; align-items: center;
         }
 
-        /* --- THE MICRO-FRAME (Raised & Smaller) --- */
+        /* --- THE 3-SIDE OPEN FRAME --- */
         #gameWrapper {
-            margin-top: 15vh; /* Pushes the game up away from bottom bars */
+            margin-top: 10vh;
             width: 90vw;
             max-width: 400px;
-            height: 45vh; /* Much smaller height for safety */
-            border: 3px solid var(--neon-blue);
-            border-radius: 20px;
+            height: 40vh;
+            /* Borders only on Left, Right, and Bottom */
+            border-left: 3px solid var(--neon-blue);
+            border-right: 3px solid var(--neon-blue);
+            border-bottom: 3px solid var(--neon-blue);
             position: relative;
             background: #000;
             overflow: hidden;
-            box-shadow: 0 0 40px rgba(0, 242, 255, 0.2);
         }
 
         canvas { width: 100%; height: 100%; display: block; }
 
-        /* --- SCORE OVERLAY --- */
         .score-hud {
             position: absolute; top: 10px; width: 100%;
             display: flex; justify-content: center;
-            font-size: 1.2rem; font-weight: 800; color: var(--neon-blue);
-            text-shadow: 0 0 10px var(--neon-blue);
+            font-size: 1.1rem; font-weight: 800; color: var(--neon-blue);
         }
 
-        /* --- ARROW BUTTONS --- */
+        /* --- NAVIGATION & JUMP CONTROLS --- */
         .btn-container {
-            display: flex; gap: 30px; margin-top: 20px;
-            width: 90%; max-width: 400px;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+            width: 90%;
+            max-width: 400px;
         }
-        .arrow-btn {
-            flex: 1; height: 80px; background: #111;
+        .ctrl-btn {
+            height: 75px; background: #111;
             border: 2px solid var(--neon-blue); color: var(--neon-blue);
-            border-radius: 15px; font-size: 2.5rem;
+            border-radius: 12px; font-size: 1.5rem;
             display: flex; align-items: center; justify-content: center;
+            font-family: 'Syncopate';
         }
-        .arrow-btn:active { background: var(--neon-blue); color: #000; }
+        .jump-btn { border-color: var(--neon-pink); color: var(--neon-pink); font-size: 1rem; }
+        .ctrl-btn:active { background: #222; opacity: 0.7; }
 
         .death-msg {
             position: absolute; inset: 0; background: rgba(0,0,0,0.9);
             display: none; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100;
         }
     </style>
 </head>
 <body>
 
-    <h1 style="font-family:'Syncopate'; font-size: 0.8rem; margin-top: 20px; letter-spacing: 3px;">SYSTEM SURFER</h1>
+    <h1 style="font-family:'Syncopate'; font-size: 0.7rem; margin-top: 20px; letter-spacing: 5px; color: #444;">VORTEX_RUNNER_6.9</h1>
 
     <div id="gameWrapper">
-        <div class="score-hud">SCR: <span id="scoreVal">0</span></div>
+        <div class="score-hud">SCORE: <span id="scoreVal">0</span></div>
         <canvas id="gameCanvas"></canvas>
         <div id="deathMsg" class="death-msg">
-            <h2 style="color:var(--neon-pink); font-family:'Syncopate';">CRASHED</h2>
-            <button onclick="game.init()" style="margin-top:20px; padding:10px 20px; background:none; border:1px solid #fff; color:#fff;">RETRY</button>
+            <h2 style="color:var(--neon-pink); font-family:'Syncopate'; font-size: 1.2rem;">COLLISION DETECTED</h2>
+            <button onclick="game.init()" style="margin-top:20px; padding:10px 25px; background:none; border:2px solid var(--neon-blue); color:var(--neon-blue); font-family:'Syncopate'; cursor:pointer;">REBOOT</button>
         </div>
     </div>
 
     <div class="btn-container">
-        <div class="arrow-btn" id="leftBtn">◀</div>
-        <div class="arrow-btn" id="rightBtn">▶</div>
+        <div class="ctrl-btn" onpointerdown="game.move(-1)">◀</div>
+        <div class="ctrl-btn jump-btn" onpointerdown="game.jump()">JUMP</div>
+        <div class="ctrl-btn" onpointerdown="game.move(1)">▶</div>
     </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        let startX = 0;
 
         const game = {
             active: false, score: 0, lane: 0, targetLane: 0,
-            obstacles: [], speed: 0.05, lastFrame: 0,
+            obstacles: [], speed: 0.05,
+            yPos: 0, yVel: 0, isJumping: false,
 
             init() {
                 canvas.width = canvas.offsetWidth;
                 canvas.height = canvas.offsetHeight;
                 this.active = true; this.score = 0; this.lane = 0; this.targetLane = 0;
                 this.obstacles = []; this.speed = 0.05;
+                this.yPos = 0; this.yVel = 0; this.isJumping = false;
                 document.getElementById('deathMsg').style.display = 'none';
-                requestAnimationFrame((t) => this.loop(t));
+                requestAnimationFrame((t) => this.loop());
             },
 
             move(dir) { this.targetLane = Math.max(-1, Math.min(1, this.targetLane + dir)); },
+            
+            jump() {
+                if (!this.isJumping) {
+                    this.yVel = 12; // Initial jump force
+                    this.isJumping = true;
+                }
+            },
 
-            loop(t) {
+            loop() {
                 if (!this.active) return;
                 this.update(); this.draw();
-                requestAnimationFrame((t) => this.loop(t));
+                requestAnimationFrame(() => this.loop());
             },
 
             update() {
                 this.score++;
                 document.getElementById('scoreVal').innerText = Math.floor(this.score/10);
                 this.lane += (this.targetLane - this.lane) * 0.2;
-                this.speed += 0.00002;
+                this.speed += 0.00001;
 
-                if (Math.random() < 0.05) this.obstacles.push({ lane: Math.floor(Math.random()*3)-1, z: 2 });
+                // Jump Physics
+                if (this.isJumping) {
+                    this.yPos += this.yVel;
+                    this.yVel -= 0.8; // Gravity
+                    if (this.yPos <= 0) {
+                        this.yPos = 0;
+                        this.isJumping = false;
+                    }
+                }
+
+                if (Math.random() < 0.04) this.obstacles.push({ lane: Math.floor(Math.random()*3)-1, z: 2 });
 
                 for (let i = this.obstacles.length - 1; i >= 0; i--) {
                     let o = this.obstacles[i];
                     o.z -= this.speed;
-                    // Collision Check
-                    if (o.z < 0.3 && o.z > 0.1 && Math.abs(o.lane - this.lane) < 0.5) this.gameOver();
+
+                    // Collision Check (Only hits if player is NOT high enough in jump)
+                    if (o.z < 0.3 && o.z > 0.1 && Math.abs(o.lane - this.lane) < 0.5) {
+                        if (this.yPos < 40) this.gameOver(); // Player can jump over blocks
+                    }
                     if (o.z < 0) this.obstacles.splice(i, 1);
                 }
             },
@@ -124,7 +152,7 @@
                 const cx = canvas.width / 2;
                 const horizY = canvas.height * 0.3;
 
-                // Perspective Floor
+                // Floor Grid (Lines moving toward you)
                 ctx.strokeStyle = '#111';
                 for(let i=0; i<10; i++) {
                     let z = (i/10 + (this.score*0.01)%0.1);
@@ -138,32 +166,22 @@
                     let x = cx + (o.lane - this.lane) * (canvas.width * 0.4) * s;
                     let y = horizY + (canvas.height - horizY) * s;
                     let sz = (canvas.width * 0.2) * s;
-                    ctx.fillStyle = var(--neon-pink);
+                    ctx.fillStyle = '#ff00ea';
                     ctx.shadowBlur = 10*s; ctx.shadowColor = '#ff00ea';
                     ctx.fillRect(x-sz/2, y-sz, sz, sz);
                 });
 
-                // Character (The Architect Box)
+                // Player Character
                 ctx.fillStyle = '#00f2ff';
                 ctx.shadowBlur = 15; ctx.shadowColor = '#00f2ff';
-                // Drawn high (80% down instead of 100%) to stay above browser bars
-                let pSz = canvas.width * 0.15;
-                ctx.fillRect(cx - pSz/2, canvas.height * 0.75, pSz, pSz);
+                let pSz = canvas.width * 0.14;
+                // Base Y + Jump Offset
+                let charY = (canvas.height * 0.75) - this.yPos;
+                ctx.fillRect(cx - pSz/2, charY, pSz, pSz);
             },
 
             gameOver() { this.active = false; document.getElementById('deathMsg').style.display = 'flex'; }
         };
-
-        // Swipe Detection
-        canvas.addEventListener('touchstart', e => startX = e.touches[0].clientX);
-        canvas.addEventListener('touchend', e => {
-            let diff = e.changedTouches[0].clientX - startX;
-            if (Math.abs(diff) > 30) game.move(diff > 0 ? 1 : -1);
-        });
-
-        // Button Controls
-        document.getElementById('leftBtn').addEventListener('pointerdown', () => game.move(-1));
-        document.getElementById('rightBtn').addEventListener('pointerdown', () => game.move(1));
 
         game.init();
     </script>
