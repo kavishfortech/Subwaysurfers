@@ -4,7 +4,7 @@
 
 
 ## 🌐 Live Access
-**Deployment Link:** [https://kavishfortech.github.io/Subwaysurfers](https://kavishfortech.github.io/Subwaysurfers)
+**Deployment Link:** [https://kavishfortech.github.io/Subwaysurfers](https://kavishfortech.github.io/subway surfers)
 
 ---
 
