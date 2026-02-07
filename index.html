@@ -1,71 +1,36 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KAVISH SHAH | NEON SURFER</title>
+    <title>KAVISHFORTECH | NEON SURFER</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=JetBrains+Mono:wght@400;800&display=swap');
         :root { --neon-blue: #00f2ff; --neon-pink: #ff00ea; --bg: #050508; }
-        
         * { box-sizing: border-box; margin: 0; padding: 0; touch-action: none; }
-        body { 
-            font-family: 'JetBrains Mono', monospace; 
-            background: var(--bg); color: #fff; 
-            height: 100vh; display: flex; flex-direction: column; align-items: center;
-        }
+        body { font-family: 'JetBrains Mono', monospace; background: var(--bg); color: #fff; height: 100vh; display: flex; flex-direction: column; align-items: center; }
 
         #gameWrapper {
-            margin-top: 8vh;
-            width: 90vw;
-            max-width: 400px;
-            height: 42vh;
-            border-left: 2px solid var(--neon-blue);
-            border-right: 2px solid var(--neon-blue);
-            border-bottom: 2px solid var(--neon-blue);
-            position: relative;
-            background: #000;
-            overflow: hidden;
+            margin-top: 8vh; width: 90vw; max-width: 400px; height: 42vh;
+            border-left: 2px solid var(--neon-blue); border-right: 2px solid var(--neon-blue); border-bottom: 2px solid var(--neon-blue);
+            position: relative; background: #000; overflow: hidden;
         }
 
         canvas { width: 100%; height: 100%; display: block; }
+        .score-hud { position: absolute; top: 10px; width: 100%; display: flex; justify-content: center; font-size: 1.1rem; color: var(--neon-blue); z-index: 10; }
 
-        .score-hud {
-            position: absolute; top: 10px; width: 100%;
-            display: flex; justify-content: center;
-            font-size: 1.1rem; font-weight: 800; color: var(--neon-blue);
-            z-index: 10;
-        }
-
-        .btn-container {
-            display: grid;
-            grid-template-columns: 1fr 1.5fr 1fr;
-            gap: 15px;
-            margin-top: 25px;
-            width: 90%;
-            max-width: 400px;
-        }
-        .ctrl-btn {
-            height: 75px; background: #111;
-            border: 2px solid var(--neon-blue); color: var(--neon-blue);
-            border-radius: 12px; font-size: 1.8rem;
-            display: flex; align-items: center; justify-content: center;
-            user-select: none;
-        }
+        .btn-container { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 15px; margin-top: 25px; width: 90%; max-width: 400px; }
+        .ctrl-btn { height: 75px; background: #111; border: 2px solid var(--neon-blue); color: var(--neon-blue); border-radius: 12px; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; user-select: none; }
         .jump-btn { border-color: var(--neon-pink); color: var(--neon-pink); font-family: 'Syncopate'; font-size: 0.9rem; }
         .ctrl-btn:active { background: var(--neon-blue); color: #000; }
+        .jump-btn:active { background: var(--neon-pink); color: #000; }
 
-        .death-msg {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.95);
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 100;
-        }
+        .death-msg { position: absolute; inset: 0; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
     </style>
 </head>
 <body>
 
-    <h1 style="font-family:'Syncopate'; font-size: 0.7rem; margin-top: 15px; letter-spacing: 5px; color: #444;">SLOW_MOTION_v4</h1>
+    <h1 style="font-family:'Syncopate'; font-size: 0.7rem; margin-top: 15px; letter-spacing: 5px; color: #444;">REBALANCED_v7</h1>
 
     <div id="gameWrapper">
         <div class="score-hud">SCR: <span id="scoreVal">0</span></div>
@@ -88,21 +53,28 @@
 
         const game = {
             active: false, score: 0, lane: 0,
-            obstacles: [], speed: 0.018, // SIGNIFICANTLY SLOWER BASE SPEED
+            obstacles: [], speed: 0.015,
             yPos: 0, yVel: 0, isJumping: false,
+            lastSpawn: 0,
 
             init() {
                 canvas.width = canvas.offsetWidth;
                 canvas.height = canvas.offsetHeight;
                 this.active = true; this.score = 0; this.lane = 0;
-                this.obstacles = []; this.speed = 0.018; 
+                this.obstacles = []; this.speed = 0.015; 
                 this.yPos = 0; this.yVel = 0; this.isJumping = false;
                 document.getElementById('deathMsg').style.display = 'none';
                 requestAnimationFrame(() => this.loop());
             },
 
             move(dir) { this.lane = Math.max(-1, Math.min(1, this.lane + dir)); },
-            jump() { if (!this.isJumping) { this.yVel = 14; this.isJumping = true; } },
+            
+            jump() {
+                if (!this.isJumping) {
+                    this.yVel = 16; // HIGHER JUMP
+                    this.isJumping = true;
+                }
+            },
 
             loop() {
                 if (!this.active) return;
@@ -113,27 +85,29 @@
             update() {
                 this.score++;
                 document.getElementById('scoreVal').innerText = Math.floor(this.score/10);
-                // Acceleration is much slower now
-                this.speed += 0.000004;
+                this.speed += 0.000003; // Slower difficulty ramp
 
+                // Smoother Gravity
                 if (this.isJumping) {
                     this.yPos += this.yVel;
-                    this.yVel -= 0.8; 
+                    this.yVel -= 0.7; // Lower gravity for more air-time
                     if (this.yPos <= 0) { this.yPos = 0; this.isJumping = false; }
                 }
 
-                // Obstacles spawn much deeper (Z=8) to give you plenty of time
-                if (Math.random() < 0.04) {
+                // Balanced Spawning
+                this.lastSpawn++;
+                if (Math.random() < 0.03 && this.lastSpawn > 40) {
                     this.obstacles.push({ lane: Math.floor(Math.random()*3)-1, z: 8 });
+                    this.lastSpawn = 0;
                 }
 
                 for (let i = this.obstacles.length - 1; i >= 0; i--) {
                     let o = this.obstacles[i];
                     o.z -= this.speed;
 
-                    // Collision box adjusted for slower speed
+                    // Hitbox logic
                     if (o.z < 0.6 && o.z > 0.3 && o.lane === this.lane) {
-                        if (this.yPos < 45) this.gameOver(); 
+                        if (this.yPos < 55) this.gameOver(); // More jump clearance
                     }
                     if (o.z < 0) this.obstacles.splice(i, 1);
                 }
@@ -142,40 +116,32 @@
             draw() {
                 ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
                 const cx = canvas.width / 2;
-                const horizY = canvas.height * 0.15; // Even deeper horizon
+                const horizY = canvas.height * 0.15;
 
-                // Lane guides for clarity
+                // Lane guides
                 ctx.strokeStyle = '#111';
                 [-1.5, -0.5, 0.5, 1.5].forEach(l => {
-                    ctx.beginPath();
-                    ctx.moveTo(cx, horizY);
-                    ctx.lineTo(cx + (l * canvas.width * 2), canvas.height);
-                    ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(cx, horizY);
+                    ctx.lineTo(cx + (l * canvas.width * 2), canvas.height); ctx.stroke();
                 });
 
-                // Render Obstacles with refined perspective
-                this.obstacles.sort((a,b) => b.z - a.z);
+                // Render Obstacles
                 this.obstacles.forEach(o => {
-                    // Linear perspective formula: 1 / z
                     let s = 1.2 / o.z; 
                     let x = cx + (o.lane) * (canvas.width * 0.5) * s;
                     let y = horizY + (canvas.height - horizY) * s;
                     let sz = (canvas.width * 0.25) * s;
-                    
-                    // Obstacles glow and become more solid as they arrive
                     let alpha = Math.min(1, 2 / o.z); 
                     ctx.fillStyle = `rgba(255, 0, 234, ${alpha})`;
-                    ctx.shadowBlur = 15 * s; ctx.shadowColor = '#ff00ea';
                     ctx.fillRect(x-sz/2, y-sz, sz, sz);
-                    ctx.shadowBlur = 0;
                 });
 
-                // Player Character (Bright Cyan)
+                // Player
                 ctx.fillStyle = '#00f2ff';
                 ctx.shadowBlur = 20; ctx.shadowColor = '#00f2ff';
                 let pSz = canvas.width * 0.16;
                 let charX = cx + (this.lane * (canvas.width * 0.4) * 0.7); 
-                let charY = (canvas.height * 0.8) - this.yPos;
+                let charY = (canvas.height * 0.82) - this.yPos;
                 ctx.fillRect(charX - pSz/2, charY, pSz, pSz);
             },
 
