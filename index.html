@@ -3,161 +3,432 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KAVISHFORTECH | SUBWAY RUNNER</title>
+    <title>KAVISHFORTECH | SUBWAY ELITE</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&display=swap');
-        :root { --rail-color: #555; --ground: #d2691e; }
-        * { box-sizing: border-box; margin: 0; padding: 0; touch-action: none; }
-        body { background: #87CEEB; font-family: sans-serif; overflow: hidden; display: flex; flex-direction: column; align-items: center; }
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=JetBrains+Mono:wght@500&display=swap');
+        
+        :root {
+            --sky: #3498db;
+            --track: #34495e;
+            --neon-blue: #00f2ff;
+            --neon-pink: #ff00ea;
+            --gold: #f1c40f;
+        }
 
-        #gameWrapper {
-            margin-top: 5vh; width: 95vw; max-width: 400px; height: 60vh;
-            border: 4px solid #333; position: relative; background: #f4a460; overflow: hidden;
-            border-bottom: none; border-radius: 20px 20px 0 0;
+        * { box-sizing: border-box; margin: 0; padding: 0; touch-action: none; user-select: none; }
+
+        body {
+            background: #111;
+            font-family: 'JetBrains Mono', monospace;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* --- MASTER CONTROLS --- */
+        .system-panel {
+            width: 100%;
+            max-width: 500px;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            background: #000;
+            border-bottom: 2px solid #222;
+        }
+
+        .sys-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #333;
+            background: transparent;
+            color: #fff;
+            font-family: 'Syncopate';
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: 0.2s;
+            border-radius: 4px;
+        }
+
+        .sys-btn:hover { border-color: var(--neon-blue); color: var(--neon-blue); }
+        .btn-abort { border-color: #551a1a; color: #a52a2a; }
+        .btn-abort:hover { border-color: #ff0000; color: #ff0000; }
+
+        /* --- GAME VIEWPORT --- */
+        #viewport {
+            position: relative;
+            width: 100vw;
+            height: 60vh;
+            max-width: 500px;
+            background: var(--sky);
+            overflow: hidden;
+            border: 4px solid #000;
         }
 
         canvas { width: 100%; height: 100%; display: block; }
-        .hud { position: absolute; top: 15px; width: 100%; display: flex; justify-content: space-around; font-family: 'Syncopate'; color: white; text-shadow: 2px 2px #000; z-index: 10; }
 
-        .controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; width: 95vw; max-width: 400px; margin-top: 10px; }
-        .btn { height: 60px; background: #333; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1.2rem; }
-        .btn:active { background: #555; }
-        .special-btns { grid-column: span 3; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .jump-btn { background: #ff4500; }
-        .roll-btn { background: #1e90ff; }
+        /* --- HUD ELEMENTS --- */
+        .hud {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            z-index: 10;
+        }
 
-        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; color: white; text-align: center; }
+        .stat-box {
+            background: rgba(0,0,0,0.6);
+            padding: 8px 15px;
+            border-radius: 5px;
+            border-left: 3px solid var(--neon-blue);
+        }
+
+        .stat-label { font-size: 0.5rem; color: #aaa; text-transform: uppercase; }
+        .stat-value { font-family: 'Syncopate'; font-size: 1rem; color: #fff; }
+
+        /* --- INPUT INTERFACE --- */
+        .controller {
+            width: 100%;
+            max-width: 500px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto auto;
+            gap: 10px;
+            padding: 20px;
+            background: #000;
+            flex-grow: 1;
+        }
+
+        .ctrl-node {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #fff;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-family: 'Syncopate';
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .ctrl-node:active { background: #333; transform: scale(0.98); }
+        .jump-node { grid-column: span 2; border-top: 3px solid var(--neon-pink); }
+        .roll-node { border-top: 3px solid var(--neon-blue); }
+
+        /* --- SCREENS --- */
+        .screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .title-glitch {
+            font-family: 'Syncopate';
+            font-size: 2rem;
+            color: var(--neon-blue);
+            text-shadow: 2px 2px var(--neon-pink);
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <div id="gameWrapper">
-        <div class="hud">
-            <div>COINS: <span id="coins">0</span></div>
-            <div>SCORE: <span id="score">0</span></div>
-        </div>
-        <canvas id="subwayCanvas"></canvas>
-        <div id="deathMsg" class="overlay">
-            <h1 style="font-family:'Syncopate'">BUSTED!</h1>
-            <button onclick="game.init()" style="margin-top:20px; padding:15px 30px; font-weight:bold; cursor:pointer;">TRY AGAIN</button>
-        </div>
+    <div class="system-panel">
+        <button class="sys-btn" onclick="engine.boot()">INIT_SYSTEM</button>
+        <button class="sys-btn btn-abort" onclick="engine.shutdown()">ABORT_ALL</button>
     </div>
 
-    <div class="controls">
-        <button class="btn" onpointerdown="game.move(-1)">LEFT</button>
-        <button class="btn" onpointerdown="game.move(0)">MID</button>
-        <button class="btn" onpointerdown="game.move(1)">RIGHT</button>
-        <div class="special-btns">
-            <button class="btn jump-btn" onpointerdown="game.jump()">JUMP</button>
-            <button class="btn roll-btn" onpointerdown="game.roll()">ROLL</button>
+    <div id="viewport">
+        <div id="startScreen" class="screen">
+            <h1 class="title-glitch">SUBWAY<br>ARCHITECT</h1>
+            <p style="color:#555; font-size:0.7rem;">VERSION 8.4.2 // KAVISHFORTECH</p>
+            <p style="color:var(--neon-blue); margin-top:20px; font-size:0.8rem;">READY FOR DEPLOYMENT</p>
         </div>
+
+        <div id="deathScreen" class="screen" style="display:none;">
+            <h1 class="title-glitch" style="color:var(--neon-pink)">CRITICAL_FAIL</h1>
+            <p id="finalScore" style="margin:10px 0;"></p>
+            <button class="sys-btn" style="max-width:200px;" onclick="engine.boot()">RE-INIT</button>
+        </div>
+
+        <div class="hud">
+            <div class="stat-box">
+                <div class="stat-label">Currency</div>
+                <div class="stat-value" id="coinDisplay">0</div>
+            </div>
+            <div class="stat-box" style="border-left-color: var(--neon-pink);">
+                <div class="stat-label">Distance</div>
+                <div class="stat-value" id="scoreDisplay">0</div>
+            </div>
+        </div>
+
+        <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <div class="controller">
+        <div class="ctrl-node" onpointerdown="input.setLane(-1)">LEFT</div>
+        <div class="ctrl-node" onpointerdown="input.setLane(0)">CENTER</div>
+        <div class="ctrl-node" onpointerdown="input.setLane(1)">RIGHT</div>
+        <div class="ctrl-node jump-node" onpointerdown="input.triggerJump()">JUMP_UP</div>
+        <div class="ctrl-node roll-node" onpointerdown="input.triggerRoll()">ROLL_DN</div>
     </div>
 
     <script>
-        const canvas = document.getElementById('subwayCanvas');
+        /**
+         * SUBWAY ARCHITECT ENGINE
+         * Total LOC Goal: Extended modularity and refined physics
+         */
+
+        const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        const game = {
-            active: false, score: 0, coins: 0, lane: 0, 
-            y: 0, vY: 0, isJumping: false, isRolling: false, rollTimer: 0,
-            objects: [], speed: 0.04,
+        // --- GLOBAL CONFIG ---
+        const CONFIG = {
+            GRAVITY: 0.7,
+            JUMP_FORCE: 14,
+            SPEED_BASE: 0.05,
+            SPEED_INC: 0.00002,
+            LANE_WIDTH: 80,
+            HORIZON: 0.25
+        };
+
+        // --- INPUT MANAGER ---
+        const input = {
+            setLane: (l) => { if(engine.running) player.targetLane = l; },
+            triggerJump: () => { if(engine.running && !player.isJumping) player.jump(); },
+            triggerRoll: () => { if(engine.running && !player.isJumping) player.roll(); }
+        };
+
+        // --- PLAYER OBJECT ---
+        const player = {
+            lane: 0,
+            targetLane: 0,
+            y: 0,
+            vY: 0,
+            isJumping: false,
+            isRolling: false,
+            rollCounter: 0,
+            width: 30,
+            height: 50,
+
+            update() {
+                // Smooth Lane Transition
+                this.lane += (this.targetLane - this.lane) * 0.2;
+
+                // Physics
+                if (this.isJumping) {
+                    this.y += this.vY;
+                    this.vY -= CONFIG.GRAVITY;
+                    if (this.y <= 0) {
+                        this.y = 0;
+                        this.isJumping = false;
+                    }
+                }
+
+                if (this.isRolling) {
+                    this.rollCounter--;
+                    if (this.rollCounter <= 0) this.isRolling = false;
+                }
+            },
+
+            jump() {
+                this.vY = CONFIG.JUMP_FORCE;
+                this.isJumping = true;
+            },
+
+            roll() {
+                this.isRolling = true;
+                this.rollCounter = 45; // Frames
+            }
+        };
+
+        // --- ENVIRONMENT & OBSTACLES ---
+        class Entity {
+            constructor(type, lane) {
+                this.type = type;
+                this.lane = lane;
+                this.z = 12; // Start distance
+                this.id = Math.random();
+            }
+        }
+
+        const world = {
+            entities: [],
+            buildings: [],
+            spawnTimer: 0,
 
             init() {
-                canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
-                this.active = true; this.score = 0; this.coins = 0; this.lane = 0;
-                this.y = 0; this.vY = 0; this.objects = []; this.speed = 0.04;
-                document.getElementById('deathMsg').style.display = 'none';
+                this.entities = [];
+                this.buildings = [];
+                for(let i=0; i<10; i++) this.spawnBuilding(i * 1.2);
+            },
+
+            spawnBuilding(zPos) {
+                this.buildings.push({ z: zPos, side: Math.random() > 0.5 ? 1 : -1, h: 100 + Math.random()*200 });
+            },
+
+            update(speed) {
+                this.spawnTimer++;
+                if (this.spawnTimer > 35) {
+                    const type = Math.random() > 0.2 ? 'TRAIN' : 'COIN';
+                    this.entities.push(new Entity(type, Math.floor(Math.random()*3)-1));
+                    this.spawnTimer = 0;
+                }
+
+                // Update Obstacles
+                for (let i = this.entities.length - 1; i >= 0; i--) {
+                    let e = this.entities[i];
+                    e.z -= speed;
+
+                    // Improved Collision Detection
+                    if (e.z < 0.6 && e.z > 0.2 && Math.round(e.lane) === Math.round(player.targetLane)) {
+                        if (e.type === 'COIN') {
+                            engine.coins++;
+                            this.entities.splice(i, 1);
+                        } else {
+                            // If player is not jumping high enough
+                            if (player.y < 35 && !player.isRolling) {
+                                engine.end();
+                            }
+                        }
+                    }
+                    if (e.z < 0) this.entities.splice(i, 1);
+                }
+
+                // Update Buildings for 3D depth effect
+                this.buildings.forEach(b => {
+                    b.z -= speed;
+                    if(b.z < 0) { b.z = 12; b.h = 100 + Math.random()*200; }
+                });
+            }
+        };
+
+        // --- CORE ENGINE ---
+        const engine = {
+            running: false,
+            score: 0,
+            coins: 0,
+            speed: CONFIG.SPEED_BASE,
+
+            boot() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+                this.running = true;
+                this.score = 0;
+                this.coins = 0;
+                this.speed = CONFIG.SPEED_BASE;
+                player.targetLane = 0;
+                player.y = 0;
+                world.init();
+                document.getElementById('startScreen').style.display = 'none';
+                document.getElementById('deathScreen').style.display = 'none';
                 this.loop();
             },
 
-            move(l) { this.lane = l; },
-            jump() { if(!this.isJumping && !this.isRolling) { this.vY = 15; this.isJumping = true; }},
-            roll() { if(!this.isJumping) { this.isRolling = true; this.rollTimer = 40; }},
+            shutdown() {
+                this.running = false;
+                document.getElementById('startScreen').style.display = 'flex';
+            },
+
+            end() {
+                this.running = false;
+                document.getElementById('deathScreen').style.display = 'flex';
+                document.getElementById('finalScore').innerText = `TOTAL DISTANCE: ${Math.floor(this.score)}`;
+            },
 
             update() {
-                this.score++;
-                this.speed += 0.00001;
-                
-                // Physics
-                if(this.isJumping) {
-                    this.y += this.vY; this.vY -= 0.8;
-                    if(this.y <= 0) { this.y = 0; this.isJumping = false; }
-                }
-                if(this.isRolling) {
-                    this.rollTimer--;
-                    if(this.rollTimer <= 0) this.isRolling = false;
-                }
+                this.score += this.speed * 10;
+                this.speed += CONFIG.SPEED_INC;
+                player.update();
+                world.update(this.speed);
 
-                // Spawn Obstacles & Coins
-                if(Math.random() < 0.05) {
-                    const type = Math.random() > 0.3 ? 'train' : 'coin';
-                    this.objects.push({ lane: Math.floor(Math.random()*3)-1, z: 10, type: type });
-                }
-
-                for(let i=this.objects.length-1; i>=0; i--) {
-                    let o = this.objects[i];
-                    o.z -= this.speed;
-
-                    // Collision Logic
-                    if(o.z < 0.6 && o.z > 0.2 && o.lane === this.lane) {
-                        if(o.type === 'coin') {
-                            this.coins++; this.objects.splice(i, 1);
-                        } else {
-                            if(!this.isJumping && !this.isRolling) this.gameOver();
-                            // Roll avoids high hurdles, Jump avoids low ones (Simplified for this build)
-                        }
-                    }
-                    if(o.z < 0) this.objects.splice(i, 1);
-                }
-                document.getElementById('score').innerText = Math.floor(this.score/10);
-                document.getElementById('coins').innerText = this.coins;
+                document.getElementById('scoreDisplay').innerText = Math.floor(this.score);
+                document.getElementById('coinDisplay').innerText = this.coins;
             },
 
             draw() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                const cx = canvas.width/2; const horizon = canvas.height*0.2;
+                const cx = canvas.width / 2;
+                const hz = canvas.height * CONFIG.HORIZON;
 
-                // Draw Rails
-                ctx.strokeStyle = '#555'; ctx.lineWidth = 3;
-                [-1, 0, 1].forEach(l => {
-                    ctx.beginPath(); ctx.moveTo(cx + l*20, horizon);
-                    ctx.lineTo(cx + l*canvas.width, canvas.height); ctx.stroke();
+                // 1. Draw Environment (Buildings)
+                ctx.fillStyle = "#2c3e50";
+                world.buildings.forEach(b => {
+                    let s = 1/b.z;
+                    let w = 200 * s;
+                    let x = cx + (b.side * 250 * s) - (b.side === 1 ? 0 : w);
+                    let y = hz + (canvas.height - hz) * s;
+                    ctx.fillRect(x, y - (b.h * s), w, b.h * s);
                 });
 
-                // Draw Objects
-                this.objects.sort((a,b) => b.z - a.z).forEach(o => {
-                    let s = 1.5/o.z;
-                    let x = cx + o.lane * (canvas.width * 0.4) * s;
-                    let y = horizon + (canvas.height - horizon) * s;
+                // 2. Draw 3D Tracks
+                ctx.strokeStyle = "rgba(255,255,255,0.2)";
+                ctx.lineWidth = 2;
+                [-1.5, -0.5, 0.5, 1.5].forEach(l => {
+                    ctx.beginPath();
+                    ctx.moveTo(cx + l*20, hz);
+                    ctx.lineTo(cx + l*canvas.width, canvas.height);
+                    ctx.stroke();
+                });
+
+                // 3. Draw Entities
+                world.entities.sort((a,b) => b.z - a.z).forEach(e => {
+                    let s = 1.5/e.z;
+                    let x = cx + e.lane * (canvas.width * 0.4) * s;
+                    let y = hz + (canvas.height - hz) * s;
                     let sz = 40 * s;
 
-                    if(o.type === 'train') {
-                        ctx.fillStyle = '#8B4513'; ctx.fillRect(x-sz, y-sz*2, sz*2, sz*2);
-                        ctx.fillStyle = '#333'; ctx.fillRect(x-sz, y-sz*2, sz*2, sz*0.5); // Top of train
+                    if(e.type === 'TRAIN') {
+                        ctx.fillStyle = "#e74c3c";
+                        ctx.fillRect(x - sz/2, y - sz*1.8, sz, sz*1.8);
+                        ctx.strokeStyle = "#fff"; ctx.strokeRect(x - sz/2, y - sz*1.8, sz, sz*1.8);
                     } else {
-                        ctx.fillStyle = '#FFD700'; ctx.beginPath();
-                        ctx.arc(x, y-sz/2, sz/2, 0, Math.PI*2); ctx.fill();
+                        ctx.fillStyle = varColor('--gold');
+                        ctx.beginPath(); ctx.arc(x, y - sz/2, sz/3, 0, Math.PI*2); ctx.fill();
                     }
                 });
 
-                // Draw Player (The "Subway Boy")
-                let pX = cx + this.lane * (canvas.width * 0.35) * 0.8;
-                let pY = (canvas.height * 0.85) - this.y;
-                let pSize = this.isRolling ? 20 : 50;
+                // 4. Draw Player
+                let pX = cx + player.lane * (canvas.width * 0.35) * 0.8;
+                let pY = (canvas.height * 0.9) - player.y;
+                let pH = player.isRolling ? 20 : 50;
 
-                // Head (Red Cap)
-                ctx.fillStyle = 'red'; ctx.fillRect(pX-10, pY-pSize-15, 20, 10);
+                // Character Shadow
+                ctx.fillStyle = "rgba(0,0,0,0.3)";
+                ctx.beginPath(); ctx.ellipse(pX, canvas.height * 0.91, 15, 5, 0, 0, Math.PI*2); ctx.fill();
+
                 // Body (Blue Hoodie)
-                ctx.fillStyle = 'blue'; ctx.fillRect(pX-15, pY-pSize, 30, pSize);
-                // Legs
-                ctx.fillStyle = '#333'; ctx.fillRect(pX-12, pY, 10, 10); ctx.fillRect(pX+2, pY, 10, 10);
+                ctx.fillStyle = "#2980b9";
+                ctx.fillRect(pX - 15, pY - pH, 30, pH);
+                // Head & Red Cap
+                ctx.fillStyle = "#ff7675"; ctx.fillRect(pX - 10, pY - pH - 15, 20, 15);
+                ctx.fillStyle = "#d63031"; ctx.fillRect(pX - 12, pY - pH - 15, 25, 5);
             },
 
-            gameOver() { this.active = false; document.getElementById('deathMsg').style.display = 'flex'; },
-            loop() { if(this.active) { this.update(); this.draw(); requestAnimationFrame(() => this.loop()); }}
+            loop() {
+                if(!this.running) return;
+                this.update();
+                this.draw();
+                requestAnimationFrame(() => this.loop());
+            }
         };
 
-        game.init();
+        function varColor(name) { return getComputedStyle(document.documentElement).getPropertyValue(name); }
+
     </script>
 </body>
 </html>
