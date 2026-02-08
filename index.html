@@ -1,163 +1,343 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAVISH 2D SIDE-SCROLLER</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Share+Tech+Mono&display=swap');
-        :root { --neon: #00f3ff; --pink: #bc13fe; --danger: #ff2e2e; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; font-family: 'Share Tech Mono', monospace; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SUBWAY ARCHITECT</title>
 
-        /* THE RGB BOX */
-        #hub { position: relative; width: 800px; height: 400px; background: #050510; border: 4px solid #fff; animation: rgbShift 3s linear infinite; overflow: hidden; }
-        @keyframes rgbShift { 0% { border-color: #f00; box-shadow: 0 0 20px #f00; } 33% { border-color: #0f0; box-shadow: 0 0 20px #0f0; } 66% { border-color: #00f; box-shadow: 0 0 20px #00f; } 100% { border-color: #f00; box-shadow: 0 0 20px #f00; } }
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Share+Tech+Mono&display=swap');
 
-        canvas { display: block; background: linear-gradient(#001, #005); }
+:root {
+    --neon-blue:#00f3ff;
+    --neon-pink:#bc13fe;
+    --neon-gold:#ffd700;
+    --danger:#ff2e2e;
+    --bg-dark:#050510;
+}
 
-        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
-        .hidden { display: none !important; }
+* { box-sizing:border-box; user-select:none; touch-action: none; }
 
-        .btn { background: none; border: 2px solid var(--neon); color: var(--neon); padding: 12px 24px; margin: 10px; font-family: 'Syncopate'; font-size: 0.7rem; cursor: pointer; }
-        .btn:hover { background: var(--neon); color: #000; }
-        .btn-shop { border-color: var(--pink); color: var(--pink); }
+body {
+    margin:0;
+    background:var(--bg-dark);
+    font-family:'Share Tech Mono', monospace;
+    overflow:hidden;
+    color:white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
 
-        #stats { position: absolute; top: 15px; left: 20px; color: var(--neon); font-size: 1.2rem; pointer-events: none; z-index: 5; }
-    </style>
+/* --- RGB TRADEMARK BOX --- */
+#trademark-box {
+    width: 95vw;
+    padding: 10px;
+    margin-bottom: 5px;
+    text-align: center;
+    font-family: 'Syncopate';
+    font-size: 1rem;
+    letter-spacing: 3px;
+    border: 2px solid #fff;
+    /* RGB Animation */
+    animation: rgbShift 3s linear infinite;
+    background: rgba(0,0,0,0.5);
+    text-transform: uppercase;
+}
+
+@keyframes rgbShift {
+    0% { border-color: #ff0000; color: #ff0000; box-shadow: 0 0 10px #ff0000; }
+    33% { border-color: #00ff00; color: #00ff00; box-shadow: 0 0 10px #00ff00; }
+    66% { border-color: #0000ff; color: #0000ff; box-shadow: 0 0 10px #0000ff; }
+    100% { border-color: #ff0000; color: #ff0000; box-shadow: 0 0 10px #ff0000; }
+}
+
+/* --- THE "SLIGHTLY SMALL" GAME BOX --- */
+#game-container {
+    position: relative;
+    width: 95vw;
+    height: 85vh; /* Occupies most of the phone screen */
+    border: 2px solid #333;
+    background: #000;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+canvas { width: 100%; height: 100%; display:block; }
+
+#ui-layer {
+    position:absolute; inset:0; pointer-events:none; z-index:10;
+}
+
+.hud-top {
+    position:absolute; top:0; width:100%;
+    display:flex; justify-content:space-between;
+    padding:15px;
+}
+
+.hud-box {
+    background:rgba(0,0,0,0.7);
+    padding:10px 20px;
+    border-radius:6px;
+    border:1px solid #333;
+    text-align:center;
+}
+
+.hud-label { font-size:0.6rem; color:#888; }
+.hud-val { font-family:'Syncopate'; font-size:1.2rem; }
+
+.screen {
+    position:absolute; inset:0;
+    background:rgba(5,5,10,0.92);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    z-index:20;
+}
+
+.hidden { display:none; }
+
+h1 {
+    font-family:'Syncopate';
+    background:linear-gradient(45deg,var(--neon-blue),var(--neon-pink));
+    -webkit-background-clip:text;
+    color:transparent;
+    text-align:center;
+}
+
+.btn {
+    padding:14px 36px;
+    margin:8px;
+    background:none;
+    border:2px solid var(--neon-blue);
+    color:var(--neon-blue);
+    font-family:'Syncopate';
+    cursor:pointer;
+    pointer-events: auto;
+}
+
+.btn-danger { border-color:var(--danger); color:var(--danger); }
+.btn-gold { border-color:var(--neon-gold); color:var(--neon-gold); }
+
+#pauseBtn {
+    position:absolute;
+    bottom:20px;
+    right:20px;
+    pointer-events:auto;
+}
+
+.touch-zones {
+    position:absolute;
+    bottom:0;
+    width:100%;
+    height:100%;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    z-index:5;
+}
+</style>
 </head>
+
 <body>
 
-<div id="hub">
-    <div id="stats">COINS: <span id="coin-val">0</span> <span id="shield-stat" style="margin-left:20px; color:var(--pink);"></span></div>
-    
+<div id="trademark-box">KAVISHFORTECH ARCHITECT</div>
+
+<div id="game-container">
     <canvas id="gameCanvas"></canvas>
 
-    <div id="start-screen" class="overlay">
-        <h1 style="font-family:'Syncopate'; margin-bottom:20px;">ARCHITECT 2D</h1>
-        <button class="btn" onclick="Game.start()">START RUN</button>
-        <button id="shop-btn" class="btn btn-shop" onclick="Game.buyBoard()">BUY SURFBOARD (50 COINS)</button>
+    <div id="ui-layer">
+        <div class="hud-top">
+            <div class="hud-box" style="border-bottom:3px solid var(--neon-blue)">
+                <div class="hud-label">DISTANCE</div>
+                <div class="hud-val" id="scoreDisplay">0</div>
+            </div>
+            <div class="hud-box" style="border-bottom:3px solid var(--neon-gold)">
+                <div class="hud-label">BANK</div>
+                <div class="hud-val" id="coinDisplay" style="color:var(--neon-gold)">0</div>
+            </div>
+        </div>
+        <button id="pauseBtn" class="btn btn-gold hidden" onclick="Game.togglePause()">STOP</button>
     </div>
 
-    <div id="death-screen" class="overlay hidden">
-        <h2 style="color:var(--danger); font-family:'Syncopate';">CRITICAL FAILURE</h2>
-        <p id="final-score" style="margin: 10px 0;"></p>
-        <button class="btn" onclick="Game.start()">REBOOT</button>
+    <div id="menuScreen" class="screen">
+        <h1>SUBWAY<br>ARCHITECT</h1>
+        <p id="deviceInfo" style="color:#777"></p>
+        <button class="btn" onclick="Game.start()">START</button>
+    </div>
+
+    <div id="deathScreen" class="screen hidden">
+        <h1 style="color:var(--danger)">GAME OVER</h1>
+        <p>DISTANCE: <span id="finalScore">0</span></p>
+        <button class="btn" onclick="Game.start()">RESTART</button>
+        <button class="btn btn-danger" onclick="Game.quit()">QUIT</button>
+    </div>
+
+    <div class="touch-zones hidden" id="touchZones">
+        <div></div>
+        <div></div>
     </div>
 </div>
 
 <script>
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-canvas.width = 800; canvas.height = 400;
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const container = document.getElementById("game-container");
+
+const isDesktop = !(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
+document.getElementById("deviceInfo").innerText =
+    isDesktop ? "DESKTOP DETECTED — KEYBOARD ENABLED" : "MOBILE DETECTED — TOUCH ENABLED";
+
+const CFG = { GRAVITY:0.6, JUMP:-13, SPEED:7, GROUND:0 };
 
 const Game = {
-    active: false, coins: 0, hasBoard: false, speed: 6,
-    player: null, obstacles: [], collectibles: [], frame: 0,
-
+    active:false,
+    paused:false,
+    score:0,
+    coins:0,
     start() {
-        this.active = true; this.frame = 0; this.speed = 6;
-        this.player = new Player();
-        this.obstacles = []; this.collectibles = [];
-        document.getElementById('start-screen').classList.add('hidden');
-        document.getElementById('death-screen').classList.add('hidden');
-        this.loop();
+        this.active=true;
+        this.paused=false;
+        this.score=0;
+        this.coins=0;
+        World.reset();
+        Player.reset();
+        hideAllScreens();
+        pauseBtn.classList.remove("hidden");
+        loop();
     },
-
-    buyBoard() {
-        if (this.coins >= 50 && !this.hasBoard) {
-            this.coins -= 50; this.hasBoard = true;
-            document.getElementById('coin-val').innerText = this.coins;
-            document.getElementById('shield-stat').innerText = "🛡️ SHIELD ACTIVE";
-        } else { alert(this.hasBoard ? "ALREADY EQUIPPED" : "NEED 50 COINS"); }
+    over() {
+        this.active=false;
+        pauseBtn.classList.add("hidden");
+        finalScore.innerText=Math.floor(this.score);
+        deathScreen.classList.remove("hidden");
     },
-
-    die() {
-        if (this.hasBoard) {
-            this.hasBoard = false;
-            document.getElementById('shield-stat').innerText = "";
-            return; 
-        }
-        this.active = false;
-        document.getElementById('death-screen').classList.remove('hidden');
-        document.getElementById('final-score').innerText = "COINS COLLECTED: " + this.coins;
+    quit() {
+        this.active=false;
+        pauseBtn.classList.add("hidden");
+        menuScreen.classList.remove("hidden");
     },
-
-    loop() {
-        if (!this.active) return;
-        ctx.clearRect(0,0,800,400);
-
-        // Ground
-        ctx.fillStyle = "#111"; ctx.fillRect(0, 350, 800, 50);
-        ctx.strokeStyle = var(--neon); ctx.strokeRect(0, 350, 800, 1);
-
-        this.player.update();
-        this.player.draw();
-
-        if (this.frame % 100 === 0) this.spawnObstacle();
-        if (this.frame % 70 === 0) this.spawnCoin();
-
-        // Update Obstacles
-        for (let i = this.obstacles.length-1; i >= 0; i--) {
-            let o = this.obstacles[i]; o.x -= this.speed;
-            ctx.fillStyle = "red"; ctx.fillRect(o.x, o.y, o.w, o.h);
-            
-            // Collision (Hitbox)
-            if (this.player.x < o.x + o.w && this.player.x + 30 > o.x &&
-                this.player.y < o.y + o.h && this.player.y + 30 > o.y) {
-                this.obstacles.splice(i,1); this.die();
-            }
-            if (o.x < -50) this.obstacles.splice(i,1);
-        }
-
-        // Update Coins
-        for (let i = this.collectibles.length-1; i >= 0; i--) {
-            let c = this.collectibles[i]; c.x -= this.speed;
-            ctx.fillStyle = "yellow"; ctx.beginPath(); ctx.arc(c.x, c.y, 8, 0, Math.PI*2); ctx.fill();
-            
-            if (Math.hypot(this.player.x+15 - c.x, this.player.y+15 - c.y) < 25) {
-                this.coins += 5; document.getElementById('coin-val').innerText = this.coins;
-                this.collectibles.splice(i,1);
-            }
-            if (c.x < -20) this.collectibles.splice(i,1);
-        }
-
-        this.frame++; this.speed += 0.001;
-        requestAnimationFrame(() => this.loop());
-    },
-
-    spawnObstacle() {
-        let h = 30 + Math.random() * 50;
-        this.obstacles.push({ x: 850, y: 350 - h, w: 30, h: h });
-    },
-
-    spawnCoin() {
-        this.collectibles.push({ x: 850, y: 200 + Math.random() * 100 });
+    togglePause() {
+        this.paused=!this.paused;
+        pauseBtn.innerText=this.paused?"RESUME":"STOP";
+        if(!this.paused) loop();
     }
 };
 
-class Player {
-    constructor() {
-        this.x = 100; this.y = 320; this.dy = 0;
-        this.jumpCount = 0; this.gravity = 0.8;
+const Player = {
+    x:100,y:0,vy:0,state:"RUN",timer:0,
+    reset(){this.y=CFG.GROUND;this.vy=0;this.state="RUN";},
+    update(){
+        this.vy+=CFG.GRAVITY;
+        this.y+=this.vy;
+        if(this.y>CFG.GROUND){this.y=CFG.GROUND;this.vy=0;}
+        if(this.state==="ROLL"){this.timer--;if(this.timer<=0)this.state="RUN";}
+    },
+    draw(){
+        const r=this.state==="ROLL";
+        const y=r?this.y+30:this.y;
+
+        ctx.fillStyle="rgba(0,0,0,.3)";
+        ctx.beginPath();
+        ctx.ellipse(this.x+20,CFG.GROUND+65,22,6,0,0,Math.PI*2);
+        ctx.fill();
+
+        ctx.fillStyle="#3498db";
+        ctx.beginPath();
+        ctx.roundRect(this.x,y+15,40,35,8);
+        ctx.fill();
+
+        if(!r){
+            ctx.fillStyle="#f1c27d";
+            ctx.beginPath();
+            ctx.arc(this.x+20,y+5,10,0,Math.PI*2);
+            ctx.fill();
+        }
     }
-    update() {
-        this.dy += this.gravity; this.y += this.dy;
-        if (this.y > 320) { this.y = 320; this.dy = 0; this.jumpCount = 0; }
+};
+
+const World = {
+    obs:[], coins:[],
+    reset(){this.obs=[];this.coins=[];},
+    update(){
+        Game.score+=CFG.SPEED*0.1;
+        if(Math.random()<0.02) this.obs.push({x:canvas.width,y:CFG.GROUND,w:40,h:60});
+        if(Math.random()<0.03) this.coins.push({x:canvas.width,y:CFG.GROUND-40,w:25,h:25});
+
+        this.obs.forEach(o=>o.x-=CFG.SPEED);
+        this.coins.forEach(c=>c.x-=CFG.SPEED);
+
+        this.obs = this.obs.filter(o=>{
+            if(hit(Player,o)) Game.over();
+            return o.x>-100;
+        });
+
+        this.coins=this.coins.filter(c=>{
+            if(hit(Player,c)){Game.coins+=10;return false;}
+            return c.x>-100;
+        });
+    },
+    draw(){
+        ctx.fillStyle="#222";
+        ctx.fillRect(0,CFG.GROUND+60,canvas.width,canvas.height);
+
+        ctx.fillStyle="#c0392b";
+        this.obs.forEach(o=>ctx.fillRect(o.x,o.y,o.w,o.h));
+
+        this.coins.forEach(c=>{
+            ctx.fillStyle="#f1c40f";
+            ctx.beginPath();
+            ctx.arc(c.x+12,c.y+12,12,0,Math.PI*2);
+            ctx.fill();
+        });
     }
-    draw() {
-        ctx.fillStyle = Game.hasBoard ? "var(--pink)" : "var(--neon)";
-        ctx.fillRect(this.x, this.y, 30, 30);
-        if (Game.hasBoard) { ctx.fillStyle="#fff"; ctx.fillRect(this.x-5, this.y+25, 40, 5); }
-    }
-    jump() {
-        if (this.jumpCount < 2) { this.dy = -13; this.jumpCount++; }
-    }
+};
+
+function hit(p,o){
+    let py=p.state==="ROLL"?p.y+30:p.y;
+    let ph=p.state==="ROLL"?30:60;
+    return p.x<o.x+o.w && p.x+40>o.x && py<o.y+o.h && py+ph>o.y;
 }
 
-window.addEventListener('keydown', (e) => {
-    if (e.key === "ArrowUp" || e.key === " ") { e.preventDefault(); Game.player.jump(); }
-});
+function loop(){
+    if(!Game.active || Game.paused) return;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    Player.update();
+    World.update();
+    World.draw();
+    Player.draw();
+    scoreDisplay.innerText=Math.floor(Game.score);
+    coinDisplay.innerText=Game.coins;
+    requestAnimationFrame(loop);
+}
+
+function hideAllScreens(){
+    menuScreen.classList.add("hidden");
+    deathScreen.classList.add("hidden");
+}
+
+if(isDesktop){
+    window.addEventListener("keydown",e=>{
+        if(!Game.active) return;
+        if(e.code==="Space"||e.code==="ArrowUp") Player.vy=CFG.JUMP;
+        if(e.code==="ArrowDown"){Player.state="ROLL";Player.timer=30;}
+    });
+} else {
+    touchZones.classList.remove("hidden");
+    // Enhanced touch for mobile
+    touchZones.children[0].addEventListener("touchstart", (e) => { e.preventDefault(); Player.vy=CFG.JUMP; });
+    touchZones.children[1].addEventListener("touchstart", (e) => { e.preventDefault(); Player.state="ROLL"; Player.timer=30; });
+}
+
+window.onload=()=>{
+    // Map canvas to container size
+    canvas.width=container.clientWidth;
+    canvas.height=container.clientHeight;
+    CFG.GROUND=canvas.height-150;
+};
 </script>
+
 </body>
 </html>
