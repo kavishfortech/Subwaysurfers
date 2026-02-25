@@ -53,11 +53,18 @@ body {
         }
 }
 
-@keyframes rgbShift {
-    0% { border-color:#ff0000;color:#ff0000;box-shadow:0 0 10px #ff0000; }
-    33% { border-color:#00ff00;color:#00ff00;box-shadow:0 0 10px #00ff00; }
-    66% { border-color:#0000ff;color:#0000ff;box-shadow:0 0 10px #0000ff; }
-    100% { border-color:#ff0000;color:#ff0000;box-shadow:0 0 10px #ff0000; }
+         @keyframes borderRGB {
+            0% { border-color: #ff0000; box-shadow: 0 0 20px #ff0000; }
+            33% { border-color: #00ff00; box-shadow: 0 0 20px #00ff00; }
+            66% { border-color: #0000ff; box-shadow: 0 0 20px #0000ff; }
+            100% { border-color: #ff0000; box-shadow: 0 0 20px #ff0000; }
+        }
+
+        @keyframes textRGB {
+            0% { color: #ff0000; }
+            33% { color: #00ff00; }
+            66% { color: #0000ff; }
+            100% { color: #ff0000; }
 }
 
 /* --- GAME BOX --- */
